@@ -1,0 +1,193 @@
+<head>
+<link rel="icon" type="image/png" href="fav.png" />
+<style>
+body {
+  margin: 0px;
+  font-family: arial;
+
+}
+.ul {
+  -webkit-appearence: none;
+  -moz-appearence: none;
+  list-style-type: none;
+  margin: 0px;
+  padding-left: 0%;
+  padding-right: 0%;
+  overflow: hidden;
+  background-color: #002c42;
+}
+.img {
+  list-style-type: none;
+  margin-right: 20px;
+  padding-left: 10%;
+  padding-right: 10%;
+  overflow: hidden;
+  background-color: #002c42;
+}
+
+li {
+  float: left;
+}
+
+.li a {
+  -webkit-appearence: none;
+  -moz-appearence: none;
+  display: block;
+  color: white;
+  padding: 16px;
+  text-decoration: none;
+  font: arial;
+}
+
+.li a:hover {
+  background-color: #111111;
+}
+.logout {
+  list-style-type: none;
+  margin-left: 20%;
+  padding-left: 10%;
+  padding-right: 10%;
+  overflow: hidden;
+  background-color: #002c42;
+  color: white;
+  padding: 16px;
+  display: block;
+}
+.b-btn {
+   -webkit-appearence: none;
+   -moz-appearence: none;
+   border: none;
+   background-color: #42c0ff;
+   border-radius: 5px;
+   padding: 15px;
+   color: white
+}
+</style>
+</head>
+<script>
+  var YOUR_CLIENT_ID = '815217932221-ctk64aq76j4rpopmg9k7gph7mea18ibg.apps.googleusercontent.com';
+  var YOUR_REDIRECT_URI = 'https://dash.rototer.com/dashboard.html';
+  var fragmentString = location.hash.substring(1);
+
+  // Parse query string to see if page request is coming from OAuth 2.0 server.
+  var params = {};
+  var regex = /([^&=]+)=([^&]*)/g, m;
+  while (m = regex.exec(fragmentString)) {
+    params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+  }
+  if (Object.keys(params).length > 0) {
+    localStorage.setItem('oauth2-test-params', JSON.stringify(params) );
+    if (params['state'] && params['state'] == 'try_sample_request') {
+      trySampleRequest();
+    }
+  }
+
+  // If there's an access token, try an API request.
+  // Otherwise, start OAuth 2.0 flow.
+  function trySampleRequest() {
+    var params = JSON.parse(localStorage.getItem('oauth2-test-params'));
+    if (params && params['access_token']) {
+       var x = document.getElementById("members-area");
+       x.style.display = "block";
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET',
+          'https://www.googleapis.com/drive/v3/about?fields=user&' +
+          'access_token=' + params['access_token']);
+      xhr.onreadystatechange = function (e) {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          console.log(xhr.response);
+        } else if (xhr.readyState === 4 && xhr.status === 401) {
+          // Token invalid, so prompt for user permission.
+          oauth2SignIn();
+        }
+      };
+      xhr.send(null);
+    } else {
+      oauth2SignIn();
+      var x = document.getElementById("members-area");
+      x.style.display = "none";
+    }
+  }
+
+  /*
+   * Create form to request access token from Google's OAuth 2.0 server.
+   */
+  function oauth2SignIn() {
+    // Google's OAuth 2.0 endpoint for requesting an access token
+    var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+    // Create element to open OAuth 2.0 endpoint in new window.
+    var form = document.createElement('form');
+    form.setAttribute('method', 'GET'); // Send as a GET request.
+    form.setAttribute('action', oauth2Endpoint);
+
+    // Parameters to pass to OAuth 2.0 endpoint.
+    var params = {'client_id': YOUR_CLIENT_ID,
+                  'redirect_uri': YOUR_REDIRECT_URI,
+                  'scope': 'profile email',
+                  'state': 'try_sample_request',
+                  'include_granted_scopes': 'true',
+                  'response_type': 'token'};
+
+    // Add form parameters as hidden input values.
+    for (var p in params) {
+      var input = document.createElement('input');
+      input.setAttribute('type', 'hidden');
+      input.setAttribute('name', p);
+      input.setAttribute('value', params[p]);
+      form.appendChild(input);
+    }
+
+    // Add form to page and submit it to open the OAuth 2.0 endpoint.
+    document.body.appendChild(form);
+    form.submit();
+  }
+</script>
+</head>
+<body class="members-area" onload="trySampleRequest();">
+<header>
+<ul class="ul">
+  <li class="img"><img src="logo.png" width="150"></img></li>
+  <li class="li"><a href="dashboard.html">Dashboard</a></li>
+  <li class="li"><a href="integrations.html">Integrations</a></li>
+  <li class="li"><a href="my-account.html">My account</a></li>
+  <li class="li"><a href="https://help.rototer.com">Help center</a></li>
+  <li class="logout"><a style="color: white;" href="https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?client_id=815217932221-ctk64aq76j4rpopmg9k7gph7mea18ibg.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Frototer.gq%2Fdashboard.html&scope=profile%20email&state=try_sample_request&include_granted_scopes=true&response_type=token&flowName=GeneralOAuthFlow">Logout</a></li>
+</ul>
+</header>
+<header>
+<ul style="width: 10%; background-color: #f0eded; padding: 15px; color: black; float: left;">
+<a href="dashboard.html"><li style="padding: 10px; text-decoration: none;">Dashboard</li></a>
+<a href="feature-requests.html"><li style="padding: 10px; text-decoration: none;">Feature requests</li></a>
+<a href="rotator-ads.html"><li style="padding: 10px;">Rotator ads</li></a>
+<a href="manage.html"><li style="padding: 10px; text-decoration: none;">Manage</li></a>
+<a href="my-account.html"><li style="padding: 10px; text-decoration: none;">Account</li></a>
+<a href="demo-video.html"><li style="padding: 10px; text-decoration: none;">Demo video</li></a>
+<a href="#" class="updates-beamer-widget"><li style="padding: 10px;">Updates</li></a>
+<li style="font-size: 16px; margin-top: 15px;">Powered by <a href="https://sewellstephens.com" target="_blank">Sewell Stephens</a></li>
+</ul>
+<div style="width: 50%; float: left; color: black; margin: 15px;">
+<h1>My account</h1>
+<table style="list-style-type: none;">
+<tr>
+<td><form action="/account-success" netlify></td>
+</tr>
+<tr>
+<td><input type="text" name="business-name" placeholder="Business name" style="-webkit-appearence: none; -moz-appearence: none; border: 1px solid black; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 10px" required /></td>
+</tr>
+<tr>
+<td><input type="text" name="business-catogory" placeholder="Business catogory" style="-webkit-appearence: none; -moz-appearence: none; border: 1px solid black; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 10px" required /></td>
+</tr>
+<tr>
+<td><input type="text" name="number-of-customers" placeholder="Number of customers" style="-webkit-appearence: none; -moz-appearence: none; border: 1px solid black; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 10px" /></td>
+</tr>
+<tr>
+<td><button style="-webkit-appearence: none; -moz-appearence: none; background-color: #00a6ff; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; padding: 10px 20px; color: white; border: none;" type="submit">Submit</button></td>
+</tr>
+<tr>
+<td></form></li>
+<p>Success, your data was sent to database</p>
+</table>
+</div>
+</body>
+</html>
